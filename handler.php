@@ -135,8 +135,6 @@ if ($type == 5479) {
     unset($leadFields['UF_CRM_1739945676']);
 
     $leadFields['UF_CRM_1692121398282'] = 5344;
-    $leadFields['UF_CRM_1741092977244'] = $reference;
-    $leadFields['UF_CRM_1676463140'] = $property_link;
 
     $response = CRest::call('crm.lead.add', ['fields' => $leadFields]);
 } else {
