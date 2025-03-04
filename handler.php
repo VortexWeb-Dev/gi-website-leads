@@ -1,5 +1,12 @@
 <?php
 
+require_once __DIR__ . "/crest/crest.php";
+require_once __DIR__ . "/utils.php";
+
+define('DEFAULT_RESPONSIBLE_PERSON', 1593);
+define('CATEGORY_ID', 24);
+
+// Handle CORS preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
@@ -7,17 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-?>
 
-<?php
-require_once __DIR__ . "/crest/crest.php";
-require_once __DIR__ . "/utils.php";
-
+// Ensure request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendResponse(405, ['status' => 'error', 'message' => 'Method Not Allowed. Use POST.']);
     exit;
 }
 
+// Get and decode JSON data
 $postData = json_decode(file_get_contents("php://input"), true);
 
 if (!$postData) {
@@ -25,71 +29,83 @@ if (!$postData) {
     exit;
 }
 
-logData("Received data: " . json_encode($postData, JSON_PRETTY_PRINT), "data.log");
-
-/*
-
-if (empty($postData['name']) || empty($postData['email']) || empty($postData['phone'])) {
-    sendResponse(400, ['status' => 'error', 'message' => 'Missing required fields (name, email, phone).']);
-    exit;
+// Validate required fields
+$requiredFields = ['name', 'email', 'phone'];
+foreach ($requiredFields as $field) {
+    if (empty($postData[$field])) {
+        sendResponse(400, ['status' => 'error', 'message' => "Missing required field: $field."]);
+        exit;
+    }
 }
 
-$form_id = htmlspecialchars($postData['form_id'] ?? '');
-$name = htmlspecialchars($postData['name']);
-$email = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
-$code = htmlspecialchars($postData['Code'] ?? '');
-$phone = htmlspecialchars($postData['phone']);
-$comments = $postData['comments'] ?? '';
+// Sanitize inputs
+$title   = htmlspecialchars($postData['title'] ?? '');
+$message = htmlspecialchars($postData['message'] ?? '');
+$name    = htmlspecialchars($postData['name']);
+$email   = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
+$phone   = htmlspecialchars($postData['phone']);
+$topic   = htmlspecialchars($postData['topic'] ?? '');
+$type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
 
+// Log received data
+logData("Received data: " . json_encode($postData, JSON_PRETTY_PRINT), "logs/data.log");
+
+// Extract name parts
 $nameParts = getNames($name);
+$assigned_by_id = DEFAULT_RESPONSIBLE_PERSON;
 
-$assigned_by_id = $form_id === 'XMEDIALAB' || $form_id === 'XMEDIALAB-LP' ? 58 : 10;
-
-$fields = [
-    'TITLE' => $name,
-    'NAME' => $nameParts['firstName'],
-    'SECOND_NAME' => $nameParts['secondName'],
-    'LAST_NAME' => $nameParts['lastName'],
-    'EMAIL' => [
-        [
-            'VALUE' => $email,
-            'VALUE_TYPE' => 'WORK',
-            'TYPE_ID' => 'EMAIL'
-        ],
-    ],
-    'PHONE' => [
-        [
-            'VALUE' => "+" . $code . $phone,
-            'VALUE_TYPE' => 'WORK',
-            'TYPE_ID' => 'PHONE'
-        ]
-    ],
-    'UF_CRM_1733723186' => $comments,
-    'UF_CRM_1733300250545' => $form_id,
-    'UF_CRM_1733720194' => '186',
+// Prepare contact data
+$contactData = [
+    'NAME'          => $nameParts['firstName'],
+    'SECOND_NAME'   => $nameParts['secondName'],
+    'LAST_NAME'     => $nameParts['lastName'],
+    'EMAIL'         => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'EMAIL']],
+    'PHONE'         => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'PHONE']],
     'ASSIGNED_BY_ID' => $assigned_by_id
 ];
 
-logData("Fields to be sent to Bitrix: " . json_encode($fields, JSON_PRETTY_PRINT), "fields.log");
+// Create contact and get ID
+$contactId = createContact($contactData);
 
+// Prepare lead fields
+$leadFields = [
+    'TITLE'                => $title,
+    'NAME'                 => $nameParts['firstName'],
+    'SECOND_NAME'          => $nameParts['secondName'],
+    'LAST_NAME'            => $nameParts['lastName'],
+    'EMAIL'                => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'EMAIL']],
+    'PHONE'                => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'PHONE']],
+    'UF_CRM_1721198189214' => $name,
+    'UF_CRM_1721198325274' => $email,
+    'UF_CRM_1736406984'    => $phone,
+    'COMMENTS'             => $message,
+    'SOURCE_ID'            => 'WEB',
+    'SOURCE_DESCRIPTION'   => $topic,
+    'UF_CRM_660FC42189F9E' => $type,
+    'ASSIGNED_BY_ID'       => $assigned_by_id,
+    'CONTACT_ID'           => $contactId,
+    'CATEGORY_ID'          => CATEGORY_ID
+];
 
-$response = CRest::call('crm.lead.add', [
-    'fields' => $fields
-]);
-logData("Response: " . json_encode($response, JSON_PRETTY_PRINT), "response.log");
+// Log lead fields
+logData("Fields to be sent to Bitrix: " . json_encode($leadFields, JSON_PRETTY_PRINT), "logs/fields.log");
 
+// Send request to Bitrix
+$response = CRest::call('crm.deal.add', ['fields' => $leadFields]);
+
+// Log response
+logData("Response: " . json_encode($response, JSON_PRETTY_PRINT), "logs/response.log");
+
+// Handle response errors
 if (isset($response['error'])) {
-    logData("Error: " . json_encode($response['error'], JSON_PRETTY_PRINT), "error.log");
+    logData("Error: " . json_encode($response['error'], JSON_PRETTY_PRINT), "logs/error.log");
     sendResponse(500, [
-        'status' => 'error',
+        'status'  => 'error',
         'message' => 'Data received but failed to create lead.',
         'details' => $response['error'],
     ]);
     exit;
 }
 
+// Success response
 sendResponse(200, ['status' => 'success', 'message' => 'Data received and lead created successfully.']);
-
-?>
-
-*/

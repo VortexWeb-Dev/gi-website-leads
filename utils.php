@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/crest/crest.php';
 
 function logData(string $message, string $logFile): void
 {
     date_default_timezone_set('Asia/Kolkata');
-    
+
     $logEntry = "[" . date('Y-m-d H:i:s') . "] " . $message . PHP_EOL;
     file_put_contents($logFile, $logEntry, FILE_APPEND);
 }
@@ -29,4 +30,13 @@ function getNames($name)
         'secondName' => $secondName,
         'lastName' => $lastName
     ];
+}
+
+function createContact($fields)
+{
+    $response = CRest::call('crm.contact.add', [
+        'fields' => $fields
+    ]);
+
+    return $response['result'];
 }
