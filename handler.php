@@ -135,6 +135,7 @@ if ($type == 5479) {
     unset($leadFields['UF_CRM_1739945676']);
 
     $leadFields['UF_CRM_1692121398282'] = 5344;
+    $leadFields['SOURCE_ID'] = "UC_02SXFQ";
 
     $response = CRest::call('crm.lead.add', ['fields' => $leadFields]);
 } else {
