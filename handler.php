@@ -4,7 +4,8 @@ require_once __DIR__ . "/crest/crest.php";
 require_once __DIR__ . "/utils.php";
 
 define('DEFAULT_RESPONSIBLE_PERSON', 1593);
-define('CATEGORY_ID', 24);
+define('PRIMARY_CATEGORY_ID', 20);
+define('SECONDARY_CATEGORY_ID', 24);
 
 // Handle CORS preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -84,7 +85,7 @@ $leadFields = [
     'UF_CRM_660FC42189F9E' => $type,
     'ASSIGNED_BY_ID'       => $assigned_by_id,
     'CONTACT_ID'           => $contactId,
-    'CATEGORY_ID'          => CATEGORY_ID
+    'CATEGORY_ID'          => $type === 5479 ? PRIMARY_CATEGORY_ID : SECONDARY_CATEGORY_ID
 ];
 
 // Log lead fields
