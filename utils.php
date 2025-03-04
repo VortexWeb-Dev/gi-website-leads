@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/crest/crest.php';
 
+define('LISTINGS_ENTITY_TYPE_ID', 1084);
+
 function logData(string $message, string $logFile): void
 {
     date_default_timezone_set('Asia/Kolkata');
@@ -39,4 +41,38 @@ function createContact($fields)
     ]);
 
     return $response['result'];
+}
+
+function getProperty($reference)
+{
+    $response = CRest::call('crm.item.list', [
+        'entityTypeId' => LISTINGS_ENTITY_TYPE_ID,
+        'filter' => [
+            'ufCrm37ReferenceNumber' => $reference
+        ]
+    ]);
+
+    return $response['result']['items'][0];
+}
+
+function getUserId(array $filter): ?int
+{
+    $response = CRest::call('user.get', [
+        'filter' => array_merge($filter, ['ACTIVE' => 'Y']),
+    ]);
+
+    if (!empty($response['error'])) {
+        error_log('Error getting user: ' . $response['error_description']);
+        return null;
+    }
+
+    if (empty($response['result'])) {
+        return null;
+    }
+
+    if (empty($response['result'][0]['ID'])) {
+        return null;
+    }
+
+    return (int)$response['result'][0]['ID'];
 }

@@ -47,13 +47,46 @@ $email   = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
 $phone   = htmlspecialchars($postData['phone']);
 $topic   = htmlspecialchars($postData['topic'] ?? '');
 $type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
+$reference = htmlspecialchars($postData['reference'] ?? '');
+
+if (!empty($reference)) {
+    $property = getProperty($reference);
+    $owner_name = $property['ufCrm37ListingOwner'] ?? null;
+
+    if ($owner_name) {
+        $nameParts = explode(' ', trim($ownerName), 2);
+
+        $firstName = $nameParts[0] ?? null;
+        $lastName = $nameParts[1] ?? null;
+
+        $owner_id = getUserId([
+            '%NAME' => $firstName,
+            '%LAST_NAME' => $lastName,
+            '!ID' => [3, 268]
+        ]);
+    }
+
+    $agent_name = $property['ufCrm37AgentName'] ?? null;
+    if ($agent_name) {
+        $nameParts = explode(' ', trim($agent_name), 2);
+
+        $firstName = $nameParts[0] ?? null;
+        $lastName = $nameParts[1] ?? null;
+
+        $agent_id = getUserId([
+            '%NAME' => $firstName,
+            '%LAST_NAME' => $lastName,
+            '!ID' => [3, 268]
+        ]);
+    }
+}
 
 // Log received data
 logData("Received data: " . json_encode($postData, JSON_PRETTY_PRINT), "logs/data.log");
 
 // Extract name parts
 $nameParts = getNames($name);
-$assigned_by_id = DEFAULT_RESPONSIBLE_PERSON;
+$assigned_by_id = isset($owner_id) ? $owner_id : (isset($agent_id) ? $agent_id : DEFAULT_RESPONSIBLE_PERSON);
 
 // Prepare contact data
 $contactData = [
@@ -85,7 +118,10 @@ $leadFields = [
     'UF_CRM_660FC42189F9E' => $type,
     'ASSIGNED_BY_ID'       => $assigned_by_id,
     'CONTACT_ID'           => $contactId,
-    'CATEGORY_ID'          => $type === 5479 ? PRIMARY_CATEGORY_ID : SECONDARY_CATEGORY_ID
+    'CATEGORY_ID'          => $type === 5479 ? PRIMARY_CATEGORY_ID : SECONDARY_CATEGORY_ID,
+    'UF_CRM_1739890146108' => $reference,
+    'UF_CRM_1735902375' => $owner_id ?? null,
+    'UF_CRM_660FC4228ABC1' => $agent_id ?? null,
 ];
 
 // Log lead fields
