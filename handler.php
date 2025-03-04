@@ -120,7 +120,7 @@ $leadFields = [
     'UF_CRM_660FC42189F9E' => $type,
     'ASSIGNED_BY_ID'       => $assigned_by_id,
     'CONTACT_ID'           => $contactId,
-    'CATEGORY_ID'          => $type === 5479 ? PRIMARY_CATEGORY_ID : SECONDARY_CATEGORY_ID,
+    'CATEGORY_ID'          => $type == 5479 ? PRIMARY_CATEGORY_ID : SECONDARY_CATEGORY_ID,
     'UF_CRM_1739890146108' => $reference,
     'UF_CRM_1735902375' => $owner_id ?? null,
     'UF_CRM_660FC4228ABC1' => $agent_id ?? null,
