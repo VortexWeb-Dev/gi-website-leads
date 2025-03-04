@@ -3,7 +3,7 @@
 require_once __DIR__ . "/crest/crest.php";
 require_once __DIR__ . "/utils.php";
 
-define('DEFAULT_RESPONSIBLE_PERSON', 1593);
+define('DEFAULT_RESPONSIBLE_PERSON', 1721);
 define('PRIMARY_CATEGORY_ID', 20);
 define('SECONDARY_CATEGORY_ID', 24);
 
@@ -131,7 +131,12 @@ $leadFields = [
 logData("Fields to be sent to Bitrix: " . json_encode($leadFields, JSON_PRETTY_PRINT), "logs/fields.log");
 
 // Send request to Bitrix
-$response = CRest::call('crm.deal.add', ['fields' => $leadFields]);
+if($type == 5479) {
+    unset($leadFields['CATEGORY_ID']);
+    $response = CRest::call('crm.lead.add', ['fields' => $leadFields]);
+} else {
+    $response = CRest::call('crm.deal.add', ['fields' => $leadFields]);
+}
 
 // Log response
 logData("Response: " . json_encode($response, JSON_PRETTY_PRINT), "logs/response.log");
