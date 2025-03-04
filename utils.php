@@ -76,3 +76,12 @@ function getUserId(array $filter): ?int
 
     return (int)$response['result'][0]['ID'];
 }
+
+
+function getPropertyLink($title)
+{
+    $url = "https://seocrm.gicrm.ae/property-detail/";
+    $title = str_replace(" | ", "-", $title);
+
+    return $url . $title;
+}

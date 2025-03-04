@@ -51,6 +51,8 @@ $reference = htmlspecialchars($postData['reference'] ?? '');
 
 if (!empty($reference)) {
     $property = getProperty($reference);
+    $property_link = getPropertyLink($property['ufCrm37TitleEn']);
+
     $owner_name = $property['ufCrm37ListingOwner'] ?? null;
 
     if ($owner_name) {
@@ -122,6 +124,7 @@ $leadFields = [
     'UF_CRM_1739890146108' => $reference,
     'UF_CRM_1735902375' => $owner_id ?? null,
     'UF_CRM_660FC4228ABC1' => $agent_id ?? null,
+    'UF_CRM_1739945676' => $property_link
 ];
 
 // Log lead fields
