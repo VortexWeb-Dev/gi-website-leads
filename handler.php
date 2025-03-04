@@ -127,11 +127,8 @@ $leadFields = [
     'UF_CRM_1739945676' => $property_link
 ];
 
-// Log lead fields
-logData("Fields to be sent to Bitrix: " . json_encode($leadFields, JSON_PRETTY_PRINT), "logs/fields.log");
-
 // Send request to Bitrix
-if($type == 5479) {
+if ($type == 5479) {
     unset($leadFields['CATEGORY_ID']);
     unset($leadFields['UF_CRM_660FC42189F9E']);
     unset($leadFields['UF_CRM_1739890146108']);
@@ -145,6 +142,9 @@ if($type == 5479) {
 } else {
     $response = CRest::call('crm.deal.add', ['fields' => $leadFields]);
 }
+
+// Log lead fields
+logData("Fields used: " . json_encode($leadFields, JSON_PRETTY_PRINT), "logs/fields.log");
 
 // Log response
 logData("Response: " . json_encode($response, JSON_PRETTY_PRINT), "logs/response.log");
