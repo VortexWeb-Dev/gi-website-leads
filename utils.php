@@ -87,5 +87,5 @@ function getPropertyLink($title)
     $title = str_replace(" ", "-", $title);
     $title = preg_replace('/[^a-z0-9\-]/', '', $title);
 
-    return $url . $title;
+    return urlencode($url . $title);
 }
