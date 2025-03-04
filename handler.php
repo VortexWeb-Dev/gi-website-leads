@@ -54,7 +54,7 @@ if (!empty($reference)) {
     $owner_name = $property['ufCrm37ListingOwner'] ?? null;
 
     if ($owner_name) {
-        $nameParts = explode(' ', trim($ownerName), 2);
+        $nameParts = explode(' ', trim($owner_name), 2);
 
         $firstName = $nameParts[0] ?? null;
         $lastName = $nameParts[1] ?? null;
