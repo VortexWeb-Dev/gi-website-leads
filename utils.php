@@ -81,7 +81,11 @@ function getUserId(array $filter): ?int
 function getPropertyLink($title)
 {
     $url = "https://seocrm.gicrm.ae/property-detail/";
+    
+    $title = strtolower($title);
     $title = str_replace(" | ", "-", $title);
+    $title = str_replace(" ", "-", $title);
+    $title = preg_replace('/[^a-z0-9\-]/', '', $title);
 
     return $url . $title;
 }
