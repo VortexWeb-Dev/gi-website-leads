@@ -2,6 +2,7 @@
 require_once __DIR__ . '/crest/crest.php';
 
 define('LISTINGS_ENTITY_TYPE_ID', 1084);
+define('PROJECT_FIELD_ID', 'UF_CRM_1645008800');
 
 function logData(string $message, string $logFile): void
 {
@@ -77,7 +78,6 @@ function getUserId(array $filter): ?int
     return (int)$response['result'][0]['ID'];
 }
 
-
 function getPropertyLink($title)
 {
     $url = "https://seocrm.gicrm.ae/property-detail/";
@@ -86,4 +86,52 @@ function getPropertyLink($title)
     $title = preg_replace('/[^a-z0-9\-]/', '', $title);
 
     return $url . $title;
+}
+
+function getProjectId($topic)
+{
+    $projectName = explode(" - ", $topic)[1] ?? null;
+    if (!$projectName) {
+        return "Invalid topic format";
+    }
+
+    $response = CRest::call('crm.lead.userfield.list', [
+        'filter' => ['FIELD_NAME' => PROJECT_FIELD_ID]
+    ]);
+
+    if (empty($response['result'][0]['ID']) || empty($response['result'][0]['LIST'])) {
+        return "User field not found";
+    }
+
+    $fieldId = $response['result'][0]['ID'];
+    $listItems = $response['result'][0]['LIST'];
+
+    foreach ($listItems as $item) {
+        if ($item['VALUE'] === $projectName) {
+            return $item['ID'];
+        }
+    }
+
+    $updateResponse = CRest::call('crm.lead.userfield.update', [
+        'ID' => $fieldId,
+        'fields' => [
+            'LIST' => array_merge($listItems, [['VALUE' => $projectName]])
+        ]
+    ]);
+
+    if ($updateResponse['result'] !== true) {
+        return "Failed to add project";
+    }
+
+    $updatedResponse = CRest::call('crm.lead.userfield.list', [
+        'filter' => ['FIELD_NAME' => PROJECT_FIELD_ID]
+    ]);
+
+    foreach ($updatedResponse['result'][0]['LIST'] ?? [] as $item) {
+        if ($item['VALUE'] === $projectName) {
+            return $item['ID'];
+        }
+    }
+
+    return null;
 }
