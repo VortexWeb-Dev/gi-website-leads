@@ -3,7 +3,8 @@
 require_once __DIR__ . "/crest/crest.php";
 require_once __DIR__ . "/utils.php";
 
-define('DEFAULT_RESPONSIBLE_PERSON', 1721);
+define('PRIMARY_DEFAULT_RESPONSIBLE_PERSON', 1721);
+define('SECONDARY_DEFAULT_RESPONSIBLE_PERSON', 1593);
 define('PRIMARY_CATEGORY_ID', 20);
 define('SECONDARY_CATEGORY_ID', 24);
 
@@ -88,7 +89,7 @@ logData("Received data: " . json_encode($postData, JSON_PRETTY_PRINT), "logs/dat
 
 // Extract name parts
 $nameParts = getNames($name);
-$assigned_by_id = isset($owner_id) ? $owner_id : (isset($agent_id) ? $agent_id : DEFAULT_RESPONSIBLE_PERSON);
+$assigned_by_id = isset($owner_id) ? $owner_id : (isset($agent_id) ? $agent_id : ($type == 5479 ? PRIMARY_DEFAULT_RESPONSIBLE_PERSON : SECONDARY_DEFAULT_RESPONSIBLE_PERSON));
 
 // Prepare contact data
 $contactData = [
