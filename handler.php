@@ -49,6 +49,7 @@ $phone   = htmlspecialchars($postData['phone']);
 $topic   = htmlspecialchars($postData['topic'] ?? '');
 $type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
 $reference = htmlspecialchars($postData['reference'] ?? '');
+$iam = htmlspecialchars($postData['iam_type'] ?? '');
 
 if (!empty($reference)) {
     $property = getProperty($reference);
@@ -125,7 +126,9 @@ $leadFields = [
     'UF_CRM_1739890146108' => $reference,
     'UF_CRM_1735902375' => $owner_id ?? null,
     'UF_CRM_660FC4228ABC1' => $agent_id ?? null,
-    'UF_CRM_1739945676' => $property_link
+    'UF_CRM_1739945676' => $property_link,
+    'UF_CRM_1746434327' => $iam,
+    'STAGE_ID' => 'NEW',
 ];
 
 // Send request to Bitrix
