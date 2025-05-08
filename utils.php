@@ -4,10 +4,17 @@ require_once __DIR__ . '/crest/crest.php';
 define('LISTINGS_ENTITY_TYPE_ID', 1084);
 define('PROJECT_FIELD_ID', 'UF_CRM_1645008800');
 
-function logData(string $message, string $logFile): void
+function logData(string $message, string $baseLogFileName): void
 {
     date_default_timezone_set('Asia/Kolkata');
 
+    $datePath = date('Y/m/d');
+    $logDir = __DIR__ . "/logs/$datePath";
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0777, true);
+    }
+
+    $logFile = "$logDir/$baseLogFileName";
     $logEntry = "[" . date('Y-m-d H:i:s') . "] " . $message . PHP_EOL;
     file_put_contents($logFile, $logEntry, FILE_APPEND);
 }
