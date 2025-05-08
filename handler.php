@@ -41,7 +41,6 @@ foreach ($requiredFields as $field) {
 }
 
 // Sanitize inputs
-$title   = htmlspecialchars($postData['title'] ?? '');
 $message = htmlspecialchars($postData['message'] ?? '');
 $name    = htmlspecialchars($postData['name']);
 $email   = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
@@ -50,6 +49,9 @@ $topic   = htmlspecialchars($postData['topic'] ?? '');
 $type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
 $reference = htmlspecialchars($postData['reference'] ?? '');
 $iam = htmlspecialchars($postData['iam_type'] ?? '');
+$contactType = htmlspecialchars($postData['contact_type'] ?? '');
+$project = htmlspecialchars($postData['project'] ?? 'N/A');
+$leadTitle = "$name - $project - Website";
 
 if (!empty($reference)) {
     $property = getProperty($reference);
@@ -66,7 +68,7 @@ if (!empty($reference)) {
         $owner_id = getUserId([
             '%NAME' => $firstName,
             '%LAST_NAME' => $lastName,
-            '!ID' => [3, 268]
+            '!ID' => [3, 268, 1945]
         ]);
     }
 
@@ -80,7 +82,7 @@ if (!empty($reference)) {
         $agent_id = getUserId([
             '%NAME' => $firstName,
             '%LAST_NAME' => $lastName,
-            '!ID' => [3, 268]
+            '!ID' => [3, 268, 1945]
         ]);
     }
 }
@@ -107,7 +109,7 @@ $contactId = createContact($contactData);
 
 // Prepare lead fields
 $leadFields = [
-    'TITLE'                => $title,
+    'TITLE'                => $leadTitle,
     'NAME'                 => $nameParts['firstName'],
     'SECOND_NAME'          => $nameParts['secondName'],
     'LAST_NAME'            => $nameParts['lastName'],
@@ -133,6 +135,8 @@ $leadFields = [
     'UF_CRM_1739945676' => $property_link,
     'UF_CRM_1746434327' => $iam == 'individual' ? 41399 : ($iam == 'agent' ? 41400 : ($iam == 'investor' ? 41401 : null)),
     'UF_CRM_1746680284399' => $iam == 'individual' ? 41406 : ($iam == 'agent' ? 41405 : ($iam == 'investor' ? 41407 : null)),
+    'UF_CRM_1746688077' => $contactType == 'phone' ? 41408 : ($contactType == 'email' ? 41409 : 41422),
+    'UF_CRM_1746689487753' => $contactType == 'phone' ? 41416 : ($contactType == 'email' ? 41417 : 41421),
     'STAGE_ID' => 'NEW',
 ];
 
@@ -143,7 +147,7 @@ if ($type == 5479) {
     unset($leadFields['UF_CRM_1739890146108']);
     unset($leadFields['UF_CRM_1739945676']);
 
-    $leadFields['UF_CRM_1692121398282'] = 5344;
+    $leadFields['UF_CRM_1692121398282'] = $iam == 'investor' ? 5344 : 5345;
     $leadFields['SOURCE_ID'] = "UC_02SXFQ";
     $leadFields['UF_CRM_1645008800'] = getProjectId($topic);
 

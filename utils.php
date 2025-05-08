@@ -135,3 +135,14 @@ function getProjectId($topic)
 
     return null;
 }
+
+function getProjectName($topic)
+{
+    $projectName = explode(" - ", $topic)[1] ?? null;
+
+    if (!$projectName) {
+        return "Unknown";
+    }
+
+    return $projectName;
+}
