@@ -127,7 +127,7 @@ $leadFields = [
     'UF_CRM_1735902375' => $owner_id ?? null,
     'UF_CRM_660FC4228ABC1' => $agent_id ?? null,
     'UF_CRM_1739945676' => $property_link,
-    'UF_CRM_1746434327' => $iam,
+    'UF_CRM_1746434327' => $iam == 'individual' ? 41399 : ($iam == 'agent' ? 41400 : ($iam == 'investor' ? 41401 : null)),
     'STAGE_ID' => 'NEW',
 ];
 
