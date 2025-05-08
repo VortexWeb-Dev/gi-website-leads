@@ -90,7 +90,7 @@ function getPropertyLink($title)
 
 function getProjectId($topic)
 {
-    $projectName = explode(" - ", $topic)[1] ?? null;
+    $projectName = getProjectName($topic);
     if (!$projectName) {
         return "Invalid topic format";
     }
@@ -138,11 +138,8 @@ function getProjectId($topic)
 
 function getProjectName($topic)
 {
-    $projectName = explode(" - ", $topic)[1] ?? null;
-
-    if (!$projectName) {
-        return "Unknown";
+    if (preg_match('/projectname\s*-\s*(.*?)\s*BY/i', $topic, $matches)) {
+        return trim($matches[1]);
     }
-
-    return $projectName;
+    return null;
 }

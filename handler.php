@@ -42,7 +42,7 @@ foreach ($requiredFields as $field) {
 
 // Sanitize inputs
 $message = htmlspecialchars($postData['message'] ?? '');
-$name    = htmlspecialchars($postData['name']);
+$name = ucwords(htmlspecialchars($postData['name']));
 $email   = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
 $phone   = htmlspecialchars($postData['phone']);
 $topic   = htmlspecialchars($postData['topic'] ?? '');
@@ -50,7 +50,7 @@ $type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
 $reference = htmlspecialchars($postData['reference'] ?? '');
 $iam = htmlspecialchars($postData['iam_type'] ?? '');
 $contactType = htmlspecialchars($postData['contact_type'] ?? '');
-$project = htmlspecialchars($postData['project'] ?? 'N/A');
+$project = htmlspecialchars($postData['project'] ?? getProjectName($topic) ?? '');
 $leadTitle = "$name - $project - Website";
 
 if (!empty($reference)) {
