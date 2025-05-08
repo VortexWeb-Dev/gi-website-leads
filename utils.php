@@ -35,6 +35,7 @@ function getNames($name)
     ];
 }
 
+
 function createContact($fields)
 {
     $response = CRest::call('crm.contact.add', [

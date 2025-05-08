@@ -32,7 +32,7 @@ if (!$postData) {
 }
 
 // Validate required fields
-$requiredFields = ['name', 'email', 'phone'];
+$requiredFields = ['name', 'email', 'call'];
 foreach ($requiredFields as $field) {
     if (empty($postData[$field])) {
         sendResponse(400, ['status' => 'error', 'message' => "Missing required field: $field."]);
@@ -44,7 +44,7 @@ foreach ($requiredFields as $field) {
 $message = htmlspecialchars($postData['message'] ?? '');
 $name = ucwords(htmlspecialchars($postData['name']));
 $email   = filter_var($postData['email'], FILTER_SANITIZE_EMAIL);
-$phone   = htmlspecialchars($postData['phone']);
+$phone   = htmlspecialchars($postData['call']);
 $topic   = htmlspecialchars($postData['topic'] ?? '');
 $type    = htmlspecialchars($postData['type'] === 'primary' ? 5479 : 5480);
 $reference = htmlspecialchars($postData['reference'] ?? '');
@@ -100,7 +100,7 @@ $contactData = [
     'SECOND_NAME'   => $nameParts['secondName'],
     'LAST_NAME'     => $nameParts['lastName'],
     'EMAIL'         => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'EMAIL']],
-    'PHONE'         => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'PHONE']],
+    'call'         => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'call']],
     'ASSIGNED_BY_ID' => $assigned_by_id
 ];
 
@@ -114,7 +114,7 @@ $leadFields = [
     'SECOND_NAME'          => $nameParts['secondName'],
     'LAST_NAME'            => $nameParts['lastName'],
     'EMAIL'                => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'EMAIL']],
-    'PHONE'                => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'PHONE']],
+    'call'                => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK', 'TYPE_ID' => 'call']],
     'UF_CRM_1721198189214' => $name,
     'UF_CRM_1741123034066' => $name,
     'UF_CRM_1721198325274' => $email,
@@ -135,8 +135,8 @@ $leadFields = [
     'UF_CRM_1739945676' => $property_link,
     'UF_CRM_1746434327' => $iam == 'individual' ? 41399 : ($iam == 'agent' ? 41400 : ($iam == 'investor' ? 41401 : null)),
     'UF_CRM_1746680284399' => $iam == 'individual' ? 41406 : ($iam == 'agent' ? 41405 : ($iam == 'investor' ? 41407 : null)),
-    'UF_CRM_1746688077' => $contactType == 'phone' ? 41408 : ($contactType == 'email' ? 41409 : 41422),
-    'UF_CRM_1746689487753' => $contactType == 'phone' ? 41416 : ($contactType == 'email' ? 41417 : 41421),
+    'UF_CRM_1746688077' => $contactType == 'call' ? 41408 : ($contactType == 'email' ? 41409 : 41422),
+    'UF_CRM_1746689487753' => $contactType == 'call' ? 41416 : ($contactType == 'email' ? 41417 : 41421),
     'UF_CRM_1645008800' => getProjectId($topic),
     'UF_CRM_63A1C03BA58DC' => $project,
     'STAGE_ID' => 'NEW',
