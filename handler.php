@@ -137,6 +137,8 @@ $leadFields = [
     'UF_CRM_1746680284399' => $iam == 'individual' ? 41406 : ($iam == 'agent' ? 41405 : ($iam == 'investor' ? 41407 : null)),
     'UF_CRM_1746688077' => $contactType == 'phone' ? 41408 : ($contactType == 'email' ? 41409 : 41422),
     'UF_CRM_1746689487753' => $contactType == 'phone' ? 41416 : ($contactType == 'email' ? 41417 : 41421),
+    'UF_CRM_1645008800' => getProjectId($topic),
+    'UF_CRM_63A1C03BA58DC' => $project,
     'STAGE_ID' => 'NEW',
 ];
 
@@ -149,7 +151,6 @@ if ($type == 5479) {
 
     $leadFields['UF_CRM_1692121398282'] = $iam == 'investor' ? 5344 : 5345;
     $leadFields['SOURCE_ID'] = "UC_02SXFQ";
-    $leadFields['UF_CRM_1645008800'] = getProjectId($topic);
 
     $response = CRest::call('crm.lead.add', ['fields' => $leadFields]);
 } else {
